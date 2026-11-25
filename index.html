@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#000000">
+  <title>Meowniversary</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <div class="datetype" id="datetype" aria-live="polite"></div>
+
+    <section class="stage" aria-label="Anniversary notifications">
+      <div class="stack" id="stack"></div>
+    </section>
+
+    <section class="stage" id="banner" style="z-index:200" aria-label="Important notification">
+      <div class="stack" id="bstack"></div>
+    </section>
+
+    <p class="hint" id="hint" aria-live="polite"></p>
+
+    <section class="chat" id="chat" aria-label="Chat with Sajil"></section>
+
+    <section class="reveal" id="reveal" aria-label="Anniversary letter">
+      <canvas class="petals" id="petals"></canvas>
+      <div class="rv" id="rv"></div>
+
+      <div class="envwrap" id="envwrap">
+        <div class="envdrop" id="envdrop">
+          <div class="envtilt" id="envtilt">
+            <img class="envface" id="env" src="photos/green-envelope.png" alt="Green anniversary envelope">
+            <span class="sheen" id="sheen"></span>
+          </div>
+        </div>
+        <div class="envshadow" id="envshadow"></div>
+        <span class="envcue">tap to open</span>
+      </div>
+
+      <article class="paper" id="paper">
+        <div class="sheet" id="sheet"></div>
+      </article>
+    </section>
+  </main>
+
+  <audio id="anniversaryMusic" src="audio/everything.mp3" preload="auto" loop></audio>
+  <script src="script.js"></script>
+</body>
+</html>
