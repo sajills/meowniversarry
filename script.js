@@ -22,13 +22,16 @@ let timers = [];
 const later = (fn, ms) => timers.push(setTimeout(fn, ms));
 
 function startAnniversaryMusic() {
+  const unlockEvents = ["pointerup", "click", "touchend", "keydown"];
+  const unlock = () => {
+    anniversaryMusic.play()
+      .then(() => unlockEvents.forEach(type => document.removeEventListener(type, unlock)))
+      .catch(playError => console.error("Could not play the anniversary audio.", playError));
+  };
+
   anniversaryMusic.play().catch(error => {
     if (error.name === "NotAllowedError") {
-      document.addEventListener("pointerdown", () => {
-        anniversaryMusic.play().catch(playError => {
-          console.error("Could not play the anniversary audio.", playError);
-        });
-      }, { once: true });
+      unlockEvents.forEach(type => document.addEventListener(type, unlock));
     } else {
       console.error("Could not play the anniversary audio.", error);
     }
@@ -46,8 +49,8 @@ function make(m) {
       <div class="msg">${m.text}</div>
     </div>`;
   stack.appendChild(el);
-  el.style.zIndex = 50 - stack.children.length; // each new one slides out from behind the previous
-  void el.offsetWidth; // commit start state
+  el.style.zIndex = 50 - stack.children.length;
+  void el.offsetWidth;
   return el;
 }
 
@@ -139,8 +142,6 @@ function startPetals() {
 }
 window.addEventListener("resize", () => { if (petals.length) sizePetals(); });
 
-
-/* ---- edit your letter here ---- */
 const LETTER = {
   title: "Happy Anniversary, Aezthette!",
   lines: [
@@ -176,7 +177,6 @@ function openLetter() {
   LETTER.lines.forEach((t, i) => nodes[i + 1].textContent = t);
   nodes[nodes.length - 1].textContent = LETTER.sign;
   nodes.forEach((n, i) => n.style.transitionDelay = (1.3 + i * 0.3) + "s");
-  // start the paper at the envelope, then rise and unfold to centre
   const er = wrap.getBoundingClientRect();
   const rr = reveal.getBoundingClientRect();
   const dx = (er.left + er.width / 2) - (rr.left + rr.width / 2);
@@ -200,13 +200,12 @@ function openLetter() {
   };
   const check = () => {
     if (!letterOpen || !paper.classList.contains("read")) return;
-    const st = sheet.scrollTop, left = sheet.scrollHeight - sheet.clientHeight - st; // single layout read
+    const st = sheet.scrollTop, left = sheet.scrollHeight - sheet.clientHeight - st;
     if (left < 40) {
       if (armed) { armed = false; banner = popBanner({ who: "Sajil", text: LOVE_MSG }, () => { banner = null; backToChat(); }); }
     } else if (left > 120) armed = true;
-    if (st <= 8) { armed = true; dismiss(); } // back at the very top: the notification goes away
+    if (st <= 8) { armed = true; dismiss(); }
   };
-  // run at most once per frame (assigning onscroll replaces any older handler when the letter is reopened)
   sheet.onscroll = () => {
     if (ticking) return;
     ticking = true;
@@ -214,7 +213,6 @@ function openLetter() {
   };
   a.onfinish = () => {
     paper.classList.add("read");
-    // lines fade in one by one; if the whole letter already fits, the end is in view once they finish
     setTimeout(check, (1.3 + nodes.length * 0.3 + 1) * 1000);
   };
   if (navigator.vibrate) try { navigator.vibrate(12) } catch (e) {}
@@ -246,7 +244,6 @@ function dropEnvelope() {
   const face = document.getElementById("env");
   const sheen = document.getElementById("sheen");
   const shadow = document.getElementById("envshadow");
-  // thickness: stacked dark copies behind the face, so the edge shows when it tilts in 3D
   if (!tilt.querySelector(".envlayer")) {
     for (let k = 1; k <= 8; k++) {
       const l = document.createElement("div");
@@ -321,7 +318,6 @@ function playReveal() {
   }, 900);
 }
 
-// tapping the notification closes the letter and returns to the chat
 function backToChat() {
   const wrap = document.getElementById("envwrap"), paper = document.getElementById("paper");
   const drop = document.getElementById("envdrop"), tilt = document.getElementById("envtilt");
@@ -339,7 +335,6 @@ function backToChat() {
     tilt.classList.remove("landed");
     rv.style.opacity = 0; rv.innerHTML = "";
     letterOpen = false; revealing = false;
-    // the tapped notification shows up in the chat as a new message
     const th = chat.querySelector("#thread");
     if (th && !th.querySelector("[data-love]")) {
       const b = document.createElement("div");
@@ -355,7 +350,7 @@ function backToChat() {
 
 const bstack = document.getElementById("bstack");
 function popBanner(m, onTap) {
-  if (onTap && bstack.querySelector(".notif.tap:not(.out)")) return; // already showing
+  if (onTap && bstack.querySelector(".notif.tap:not(.out)")) return;
   const el = document.createElement("div");
   el.className = "notif";
   el.setAttribute("role", "status");
@@ -377,7 +372,7 @@ function popBanner(m, onTap) {
     el.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
   }
   if (navigator.vibrate) try { navigator.vibrate(18) } catch (e) {}
-  if (!onTap) { // tappable banners stay until tapped
+  if (!onTap) {
     setTimeout(() => el.classList.add("out"), 3800);
     setTimeout(() => el.remove(), 4600);
   }
@@ -436,7 +431,6 @@ function openChat() {
     thread.scrollTop = thread.scrollHeight;
   }, tIn + 2200);
 
-  // her reply: iOS keyboard comes up and she types
   const ctext = chat.querySelector('#ctext');
   const send = chat.querySelector('#send');
   const comp = chat.querySelector('.composer');
@@ -502,7 +496,6 @@ function openChat() {
     thread.appendChild(me);
     stick(700);
   }, tSend);
-  // Sajil: Seen -> typing -> reply
   const tSeen = tSend + 900;
   later(() => {
     const sn = document.createElement('div');
@@ -539,13 +532,13 @@ function openChat() {
 function showHint() {
   const t = "click the attachment notification aezthette";
   const last = stack.lastElementChild;
-  if (last) { // sit right under the notification stack
+  if (last) {
     hint.style.bottom = "auto";
     hint.style.top = (last.getBoundingClientRect().bottom + 22) + "px";
   }
   hint.innerHTML = '<em class="ht"></em><u class="hc"></u><em class="hr"></em>';
   const ht = hint.querySelector(".ht"), hr = hint.querySelector(".hr");
-  hr.textContent = t; // invisible; reserves the full line so the text stays centered while typing
+  hr.textContent = t;
   let tt = 250;
   [...t].forEach((c, k) => {
     tt += 45 + Math.random() * 55;
@@ -568,21 +561,21 @@ function play() {
 
 function typeDate(done) {
   const el = document.getElementById("datetype");
-  const text = "May 11, 2025";
+  const text = "May 11, 2026";
   el.classList.remove("off");
   el.classList.add("typing");
   el.innerHTML = '<div class="dline"><span id="dtxt"></span><span class="caret"></span><span id="drest"></span></div>';
   const out = el.querySelector("#dtxt"), rest = el.querySelector("#drest");
-  rest.textContent = text; // invisible; reserves full width so the date stays centered while typing
+  rest.textContent = text;
   const setN = n => { out.textContent = text.slice(0, n); rest.textContent = text.slice(n); };
   const reduce = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
-  let t = 700; // beat before typing starts
+  let t = 700;
   if (reduce) { setN(text.length); t = 0; }
   else [...text].forEach((c, i) => {
     t += 85 + Math.random() * 90 + (c === "," ? 140 : 0);
     later(() => setN(i + 1), t);
   });
-  later(() => el.classList.remove("typing"), t + 100); // caret blinks while it rests
+  later(() => el.classList.remove("typing"), t + 100);
   later(() => el.classList.add("off"), t + 1500);
   later(startAnniversaryMusic, t);
   later(done, t + 2100);
