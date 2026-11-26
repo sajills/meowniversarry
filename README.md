@@ -8,7 +8,7 @@ First come the notifications. Then a chat. Then an envelope, a letter, falling p
 
 | What | Where |
 | :--- | :--- |
-| **Live site** | [**Open Meowniversary**](sajills.github.io/meowniversarry/) |
+| **Live site** | [**Open Meowniversary**](https://sajills.github.io/meowniversarry/) |
 | **Best viewed on** | A phone, in portrait. Desktop works too, it just has less plot. |
 | **Sound** | On. Obviously. Don't make me explain why. |
 
